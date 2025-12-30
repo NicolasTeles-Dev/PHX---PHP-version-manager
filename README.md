@@ -62,7 +62,7 @@ Tudo isso acontece **automaticamente a cada prompt do shell**.
 ### 1️⃣ Clonar o repositório
 
 ```bash
-https://github.com/NicolasTeles-Dev/PHX---PHP-version-manager.git
+https://github.com/NicolasTeles-Dev/PHX-PHP-version-manager.git
 cd PHX
 ```
 
