@@ -63,7 +63,7 @@ phx_rehash() {
     done < <(find "$bin_path" -maxdepth 1 -type f -executable -name "*${version}" -print0)
   done
 
-  [[ ${#found_binaries[@]} -gt 0 ]] || err "PHP $version não encontrado"
+  [[ ${#found_binaries[@]} -gt 0 ]] || err "PHP $version not found"
 
   for bin in "${found_binaries[@]}"; do
     local base
@@ -73,7 +73,7 @@ phx_rehash() {
     ln -sf "$bin" "$SHIMS_DIR/${base%$version}"
   done
 
-  [[ "$quiet" == "true" ]] || msg "Usando PHP $version"
+  [[ "$quiet" == "true" ]] || msg "Using PHP $version"
 }
 
 phx_find_local_version() {
@@ -126,7 +126,7 @@ cmd_init() {
       echo 'fi'
       ;;
     *)
-      echo '# Shell não suportado para auto switch'
+      echo '# Shell not supported for auto switch'
       ;;
     esac
     return
@@ -134,11 +134,11 @@ cmd_init() {
 
   mkdir -p "$PHX_DIR" "$SHIMS_DIR"
   touch "$GLOBAL_VERSION_FILE"
-  msg "PHX instalado em $PHX_DIR"
+  msg "PHX installed on $PHX_DIR"
 }
 
 cmd_list() {
-  msg "Versões PHP disponíveis:"
+  msg "Available PHP versions:"
   for v in $(phx_list_all_versions); do
     [[ "${PHX_ACTIVE_VERSION:-}" == "$v" ]] &&
       echo -e "  ${C_GREEN}* $v${C_RESET}" ||
@@ -148,8 +148,8 @@ cmd_list() {
 
 cmd_global() {
   local v="${1:-}"
-  [[ -z "$v" ]] && err "Uso: phx global <versão>"
-  phx_list_all_versions | grep -qx "$v" || err "PHP $v não instalado"
+  [[ -z "$v" ]] && err "Usage: phx global <version>"
+  phx_list_all_versions | grep -qx "$v" || err "PHP $v not installed"
 
   echo "$v" >"$GLOBAL_VERSION_FILE"
   phx_auto_switcher
@@ -157,8 +157,8 @@ cmd_global() {
 
 cmd_local() {
   local v="${1:-}"
-  [[ -z "$v" ]] && err "Uso: phx local <versão>"
-  phx_list_all_versions | grep -qx "$v" || err "PHP $v não instalado"
+  [[ -z "$v" ]] && err "Usage: phx local <version>"
+  phx_list_all_versions | grep -qx "$v" || err "PHP $v not installed"
 
   echo "$v" >.phx-version
   phx_auto_switcher
@@ -166,8 +166,8 @@ cmd_local() {
 
 cmd_current() {
   [[ "${PHX_ACTIVE_VERSION:-system}" == "system" ]] &&
-    msg "Usando PHP do sistema" ||
-    msg "PHP ativo: ${C_GREEN}$PHX_ACTIVE_VERSION${C_RESET}"
+    msg "Using system PHP" ||
+    msg "Active PHP: ${C_GREEN}$PHX_ACTIVE_VERSION${C_RESET}"
   php -v
 }
 
@@ -181,7 +181,7 @@ cmd_help() {
   cat <<EOF
 phx - PHP Version Manager
 
-Comandos:
+Commands:
   init
   list
   global <versão>
@@ -206,7 +206,7 @@ main() {
   which) cmd_which ;;
   __auto_switcher) phx_auto_switcher ;;
   help | -h | --help) cmd_help ;;
-  *) err "Comando desconhecido: $cmd" ;;
+  *) err "Unknown command: $cmd" ;;
   esac
 }
 
