@@ -1,3 +1,9 @@
+## v0.2.1-b0 (2026-01-13)
+
+### Fix
+
+- **code**: fix shell script bug affecting the autoloader and rehash shims
+
 ## v0.2.0 (2026-01-08)
 
 ### Feat

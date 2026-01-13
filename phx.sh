@@ -6,7 +6,7 @@
 set -euo pipefail
 
 # --- Version ---
-PHX_VERSION="0.2.0"
+PHX_VERSION="0.2.1-b0"
 
 # --- Visual helpers ---
 C_RESET="\033[0m"
