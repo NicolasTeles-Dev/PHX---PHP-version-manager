@@ -63,27 +63,39 @@ phx_rehash() {
   rm -rf "$SHIMS_DIR"
   mkdir -p "$SHIMS_DIR"
 
-  [[ "$version" == "system" || -z "$version" ]] && return 0
+  if [[ "$version" == "system" || -z "$version" ]]; then
+    if ! [[ "$quiet" == "true" ]]; then
+      msg "Using system PHP"
+    fi
+    return 0
+  fi
 
+  local php_bin
   for bin_path in "${PHX_BIN_PATHS[@]}"; do
-    [[ -d "$bin_path" ]] || continue
-
-    while IFS= read -r -d $'\0' bin; do
-      found_binaries+=("$bin")
-    done < <(find "$bin_path" -maxdepth 1 -type f -executable -name "*${version}" -print0)
+    if [[ -x "$bin_path/php$version" ]]; then
+      php_bin="$bin_path/php$version"
+      break
+    fi
   done
 
-  [[ ${#found_binaries[@]} -gt 0 ]] || err "PHP $version not found"
+  [[ -n "$php_bin" ]] || err "PHP $version not found"
 
-  for bin in "${found_binaries[@]}"; do
-    local base
-    base=$(basename "$bin")
+  local bins_to_shim=(
+    "php" "phar" "php-cgi" "php-fpm" "php-config" "phpize" "phpdbg"
+  )
 
-    [[ "$base" =~ ^(php|phar|php-cgi|php-fpm|php-config|phpize|phpdbg|php-cli) ]] || continue
-    ln -sf "$bin" "$SHIMS_DIR/${base%$version}"
+  for bin_name in "${bins_to_shim[@]}"; do
+    for bin_path in "${PHX_BIN_PATHS[@]}"; do
+      if [[ -x "$bin_path/$bin_name$version" ]]; then
+        ln -sf "$bin_path/$bin_name$version" "$SHIMS_DIR/$bin_name"
+        break
+      fi
+    done
   done
 
-  [[ "$quiet" == "true" ]] || msg "Using PHP $version"
+  if ! [[ "$quiet" == "true" ]]; then
+    msg "Using PHP $version"
+  fi
 }
 
 phx_find_local_version() {
@@ -124,7 +136,7 @@ cmd_init() {
       echo 'phx_auto_switcher() { command phx __auto_switcher; }'
       echo 'if [[ -z "${PHX_HOOKED:-}" ]]; then'
       echo '  export PHX_HOOKED=1'
-      echo '  PROMPT_COMMAND="phx_auto_switcher${PROMPT_COMMAND:+; $PROMPT_COMMAND}"'
+      echo '  PROMPT_COMMAND="phx_auto_switcher${PROMPT_COMMAND:+\; $PROMPT_COMMAND}"'
       echo 'fi'
       ;;
     zsh)

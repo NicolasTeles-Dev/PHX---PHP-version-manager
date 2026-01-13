@@ -6,191 +6,179 @@
 
 `phx` is a **simple, fast, and compilation-free** PHP version manager, inspired by tools such as `nvm` and `pyenv`.
 
-It works **exclusively with PHP versions already installed on the system**
-(`apt`, `brew`, etc.), using *shims* to switch versions automatically
-by project or globally.
+It works **exclusively with PHP versions already installed on your system** (`apt`, `brew`, etc.), using *shims* to automatically switch versions by project or globally.
 
 ---
 
 ## ✨ Key Features
 
 - ⚡ **Instant version switching**
-- 📁 **Version per project** with `.phx-version`
+- 📁 **Per-project version** with `.phx-version` files
 - 🌍 **Global version**
 - 🔄 **Automatic switching when entering/leaving directories**
-- 🧩 **Compatible with PHP installed via apt**
-- 🧼 **Simple implementation in Bash**
+- 🧩 **Compatible with PHP installed via `apt`**
+- 🧼 **Simple and clean implementation in Bash**
 
 ---
 
 ## 📖 Table of Contents
 
-- [How it works](#-how-it-works)
+- [How it Works](#-how-it-works)
 - [Installation](#-installation)
 - [Usage](#-usage)
-- [Optional configuration](#️-optional-configuration)
-- [Contribution](#-how-to-contribute)
+- [Optional Configuration](#️-optional-configuration)
+- [Contributing](#-contributing)
 - [License](#-license)
 
 ---
 
-## 🤔 How it works
+## 🤔 How it Works
 
 `phx` uses the concept of **shims**:
 
-1. It creates the directory `~/.phx/shims`
-2. This directory is added to the beginning of `PATH`
-3. Shims are **symbolic links** (`php`, `phpize`, etc.)
-4. When changing versions, `phx` only updates these links
+1.  It creates a `~/.phx/shims` directory.
+2.  This directory is added to the beginning of your `PATH`.
+3.  The shims are **symbolic links** (e.g., `php`, `phpize`) to the actual PHP binaries.
+4.  When you switch versions, `phx` simply updates these symbolic links.
 
-The active version is determined by priority:
+The active version is determined by this priority:
 
-1. `.phx-version` file in the directory (or above)
-2. Global version (`phx global`)
-3. System PHP
+1.  `.phx-version` file in the current directory (or any parent directory).
+2.  Global version set with `phx global`.
+3.  System's default PHP.
 
-All of this happens **automatically at each shell prompt**.
+This check and switch happen **automatically at each new shell prompt**.
 
 ---
 
 ## 🚀 Installation
 
-### 1️⃣ Clone the repository
+### 1. Clone the Repository
 
 ```bash
-https://github.com/NicolasTeles-Dev/PHX-PHP-version-manager.git
-cd PHX
+git clone https://github.com/NicolasTeles-Dev/PHX-PHP-version-manager.git
+cd PHX-PHP-version-manager
 ```
 
-### 2️⃣ Clone the repository
+### 2. Install the `phx` Command
+
+This will make the `phx` command available system-wide.
 
 ```bash
-chmod +x phx
-sudo cp phx /usr/local/bin/phx
+chmod +x phx.sh
+sudo mv phx.sh /usr/local/bin/phx
 ```
 
-#### Check:
+Verify the installation by running:
 
 ```bash
 phx --help
 ```
 
-### 3️⃣ Enable PHX in the shell
+### 3. Enable `phx` in Your Shell
 
-#### Run once:
-
-```bash
-eval “$(phx init -)”
-```
-
-#### Then add this same line to your shell:
+Add the following line to your shell's configuration file (`~/.bashrc`, `~/.zshrc`, etc.). This will enable the automatic version switcher.
 
 ```bash
-Zsh → ~/.zshrc
-Bash → ~/.bashrc
+eval "$(phx init -)"
 ```
 
-#### Add this line:
-```bash
-eval “$(phx init -)”
-```
+After adding the line, restart your terminal or reload the configuration with `exec bash` or `exec zsh`.
 
-#### Restart the terminal or run:
-```bash
-exec zsh
-# or
-exec bash
-```
+### ✅ Done!
 
-### ✅ Done
-
-#### PHX is now active.
-
-##### Confirm:
+`phx` is now active. You can confirm by listing the available PHP versions:
 
 ```bash
 phx list
 ```
 
-### 💻 Usage
+---
 
-#### List available versions
+## 💻 Usage
+
+#### List Available Versions
 
 ```bash
 phx list
 ```
 
-#### Set global version
+#### Set the Global Version
+
+This version will be used by default in any directory without a specific version set.
 
 ```bash
 phx global 8.3
 php -v
 ```
 
-#### Set version per project
+#### Set a Local (Per-Project) Version
+
+This creates a `.phx-version` file in the current directory, which overrides the global setting.
 
 ```bash
-cd my-project
-phx local 8.4
+cd my-project/
+phx local 8.2
 php -v
 ```
 
-#### This creates a file in the directory.
-```bash
-phx-version 
-``` 
+`phx` will automatically use the version specified in `.phx-version` whenever you are in this directory or any of its subdirectories.
 
-#### View active version
+#### Check the Current Active Version
 
 ```bash
 phx current
 ```
 
-#### View which PHP is being used
+#### See Which PHP Binary is Being Used
 
 ```bash
 phx which
 ```
 
-#### Show phx version
+#### Display the `phx` Version
 
 ```bash
 phx version
 ```
 
-### ⚙️ Optional configuration
+---
 
-#### By default, phx searches for PHP versions in:
+## ⚙️ Optional Configuration
 
-```bash
-/usr/bin
-```
+By default, `phx` searches for PHP executables in `/usr/bin`. If you have PHP versions installed in other locations (e.g., Homebrew, custom directories), you can add them by setting the `PHX_BIN_PATHS_DEFAULT` environment variable.
 
-#### If you use other paths (e.g., Homebrew), set them before init:
+Set it **before** the `phx init` line in your shell configuration file (`.bashrc` or `.zshrc`).
 
 ```bash
+# Example for Homebrew on macOS
 export PHX_BIN_PATHS_DEFAULT="/usr/bin /opt/homebrew/bin"
+
+# Example for multiple custom paths
+export PHX_BIN_PATHS_DEFAULT="/usr/bin /usr/local/bin /path/to/php/versions"
+
+eval "$(phx init -)"
 ```
 
-#### You can use multiple paths separated by spaces.
+You can include multiple paths separated by spaces.
 
-### 🤝 How to contribute
+---
 
-#### Contributions are welcome 🚀
-#### 1. Fork the repository
-#### 2. Create a branch
-```bash
-    feature/my-feature
-```
-#### 3. Commit your changes
-#### 4. Open a Pull Request
+## 🤝 Contributing
 
-##### Suggestions and bugs can be submitted via Issues.
+Contributions are welcome! 🚀
 
-### 📜 License
+1.  **Fork** the repository.
+2.  **Create a branch** for your feature (`feature/my-feature`).
+3.  **Commit** your changes.
+4.  **Open a Pull Request**.
 
-##### MIT License
+Suggestions and bug reports can be submitted via the [Issues](https://github.com/NicolasTeles-Dev/PHX-PHP-version-manager/issues) page.
 
-##### Copyright (c) 2025
-#### Nicolas Teles
+---
 
+## 📜 License
+
+This project is licensed under the MIT License.
+
+**Copyright (c) 2024 Nicolas Teles**

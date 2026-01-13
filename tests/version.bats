@@ -11,5 +11,5 @@ setup() {
 
 @test "displays version information" {
   run "$PHX_SCRIPT" version
-  assert_output "phx 0.1.0"
+  assert_output "phx 0.2.0"
 }
